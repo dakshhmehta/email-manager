@@ -28,7 +28,13 @@ class EmailManagerServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		//
+		// Bindings
+		$this->app->bind('Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository', 'Dakshhmehta\EmailManager\EmailTemplate');
+		$this->app->bind('Dakshhmehta\EmailManager\Repositories\EmailRepository', 'Dakshhmehta\EmailManager\EmailProvider');
+
+		$this->app['emails'] = $this->app->singleton(function(){
+			return new Dakshhmehta\EmailManager\Repositories\EmailRepository;	
+		});
 	}
 
 	/**
@@ -38,7 +44,7 @@ class EmailManagerServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return array('emails');
 	}
 
 }
