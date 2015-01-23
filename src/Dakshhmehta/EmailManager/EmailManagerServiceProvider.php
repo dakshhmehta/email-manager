@@ -29,11 +29,15 @@ class EmailManagerServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		// Bindings
-		$this->app->bind('Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository', 'Dakshhmehta\EmailManager\EmailTemplate');
+		$this->app->bind('Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository', 'Dakshhmehta\EmailManager\EmailTemplateProvider');
 		$this->app->bind('Dakshhmehta\EmailManager\Repositories\EmailRepository', 'Dakshhmehta\EmailManager\EmailProvider');
 
-		$this->app['emails'] = $this->app->singleton(function(){
-			return new Dakshhmehta\EmailManager\Repositories\EmailRepository;	
+		$this->app['email'] = $this->app->share(function() {
+			return $this->app->make('Dakshhmehta\EmailManager\Repositories\EmailRepository');	
+		});
+
+		$this->app['email.template'] = $this->app->share(function(){
+			return $this->app->make('Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository');	
 		});
 	}
 
@@ -44,7 +48,7 @@ class EmailManagerServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('emails');
+		return array('email', 'email.template');
 	}
 
 }

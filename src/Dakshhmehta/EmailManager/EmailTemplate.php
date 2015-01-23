@@ -1,13 +1,13 @@
 <?php namespace Dakshhmehta\EmailManager;
 
-use Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository;
+use Config;
 
-class EmailTemplate extends Eloquent implements EmailTemplateRepository {
-	protected $table = 'mail_templates';
+class EmailTemplate extends \Eloquent {
+	protected $table = 'email_templates';
 	protected $guarded = array();
 
 	public static $rules = array(
-		'name'	=>	'required|unique:mails_templates',
+		'name'	=>	'required|unique:mail_templates',
 		'body'	=>	'required',
 		'subject' => 'required'
 	);
@@ -47,13 +47,7 @@ class EmailTemplate extends Eloquent implements EmailTemplateRepository {
 		return $vars;
 	}
 
-	public function variables(){
-		return json_decode($this->original['variables']);
-	}
-
-/*	
-	@Depricated
-	public static function field($name, $value)
+	public function field($name, $value)
 	{
 		$values = array();
 		$multiSelect = false;
@@ -99,5 +93,5 @@ class EmailTemplate extends Eloquent implements EmailTemplateRepository {
 
 		return $html;
 
-	}*/
+	}
 }

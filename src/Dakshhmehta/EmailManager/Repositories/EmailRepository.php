@@ -3,6 +3,5 @@
 use Dakshhmehta\EmailManager\EmailTemplate;
 
 interface EmailRepository {
-	public function send($input, EmailTemplate $template, $variables, $modified = false);
-	
+	public function send($input, EmailTemplate $template, $variables, $modified = false);	
 }

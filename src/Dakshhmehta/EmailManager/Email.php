@@ -1,20 +1,15 @@
-<?php
+<?php namespace Dakshhmehta\EmailManager;
 
-class Email extends JsModel {
-	protected $table = 'mails';
+use Config;
+use Eloquent;
+
+class Email extends Eloquent {
+	protected $table = Config::get('email-manager::mails_table');
 
 	protected $guarded = array();
 
-	public static $rules = array();
-
-	public static $relationsData = array(
-		'user'		=>	array(self::BELONGS_TO, 'User')
-	);
-
-	public function company()
-	{
-		// @todo Test this
-		return $this->belongsTo('Company', 'to', 'email');
+	public function user(){
+		return $this->belongsTo('User');
 	}
 
 	public function scopeTo($query, $email){

@@ -1,8 +1,8 @@
-<?php namespace Dakshhmehta\EmailManager\EmailProvider;
+<?php namespace Dakshhmehta\EmailManager;
 
 use Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository;
 
-class EmailProvider implements EmailRepository {
+class EmailProvider extends Email implements EmailRepository {
 	// @todo Need better solution for email parser
 	public static function send($input, EmailTemplateRepository $template = null, $variables = array(), $modified = false)
 	{
