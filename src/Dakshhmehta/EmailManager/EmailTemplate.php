@@ -47,51 +47,7 @@ class EmailTemplate extends \Eloquent {
 		return $vars;
 	}
 
-	public function field($name, $value)
-	{
-		$values = array();
-		$multiSelect = false;
-		if(is_array($value))
-		{
-			foreach ($value as $val) {
-				$values[] = $val;
-			}
-			$multiSelect = true;
-		}
-		
-		if($multiSelect == true)
-		{
-			Template::addRawJS('
-				$(document).ready(function(){
-					$("#'.$name.'").select2();
-				});
-			');
-		}
-		
-		$html = '<select'.(($multiSelect == true) ? ' multiple' : '').' class="form-control" name="'.$name.(($multiSelect == true) ? '[]' : '').'" id="'.$name.'">';
-		
-		if($multiSelect === false)
-		{
-			$html .= '<option value="">-- Select --</option>';
-		}
-
-		$options = self::all();
-
-		foreach($options as $option)
-		{
-			$html .= '<option '.(
-				(
-					($multiSelect == false) 
-					? ($option->name === $value || $option->id == $value) 
-					: (in_array($option->name, $values) || in_array($option->id, $values))
-				) 
-				? 'selected ' 
-				: '').'value="'.$option->id.'" data-subject="'.htmlspecialchars($option->subject).'" data-body="'.htmlspecialchars($option->body).'" data-variables="'.implode(',', $option->variables).'">'.$option->name.'</option>';
-		}
-
-		$html .= '</select>';
-
-		return $html;
-
+	public function variables(){
+		return json_decode($this->original['variables']);
 	}
 }

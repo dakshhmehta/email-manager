@@ -33,11 +33,11 @@ class EmailManagerServiceProvider extends ServiceProvider {
 		$this->app->bind('Dakshhmehta\EmailManager\Repositories\EmailRepository', 'Dakshhmehta\EmailManager\EmailProvider');
 
 		$this->app['email'] = $this->app->share(function() {
-			return $this->app->make('Dakshhmehta\EmailManager\Repositories\EmailRepository');	
+			return $this->app->make('Dakshhmehta\EmailManager\Repositories\EmailRepository');
 		});
 
 		$this->app['email.template'] = $this->app->share(function(){
-			return $this->app->make('Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository');	
+			return $this->app->make('Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository');
 		});
 	}
 

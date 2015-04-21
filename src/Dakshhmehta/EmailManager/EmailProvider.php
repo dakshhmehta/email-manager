@@ -1,13 +1,16 @@
 <?php namespace Dakshhmehta\EmailManager;
 
-use Dakshhmehta\EmailManager\Repositories\EmailTemplateRepository;
+use Dakshhmehta\EmailManager\EmailTemplate;
+use Dakshhmehta\EmailManager\Repositories\EmailRepository;
+use Mail;
+use Debugbar;
 
 class EmailProvider extends Email implements EmailRepository {
 	// @todo Need better solution for email parser
-	public static function send($input, EmailTemplateRepository $template = null, $variables = array(), $modified = false)
+	public function send($input, EmailTemplate $emailTemplate = null, $mailVariables = array(), $modified = false)
 	{
 		// If template is selected
-		if($template != null)
+		if($emailTemplate != null)
 		{
 			// Prepare the original message with it's variables
 			$variables = $emailTemplate->variables();
@@ -23,6 +26,12 @@ class EmailProvider extends Email implements EmailRepository {
 			}
 			else {
 				$input['body'] = str_replace('##message##', $input['body'], $emailTemplate->body);
+			}
+
+			// Change the subject
+			if(! isset($input['subject']))
+			{
+				$input['subject'] = $emailTemplate->subject;
 			}
 
 			// Bind the signature of user
@@ -48,21 +57,35 @@ class EmailProvider extends Email implements EmailRepository {
 						// Yes, it is. lets take key's value
  						$key = explode('.', $var);
  						if(is_object($mailVariables[$key[0]])){
+ 							Debugbar::addMessage('Preparing system object value'.$key[0], 'debug');
+
  							try {
  	 							$value = $mailVariables[$key[0]]->{$key[1]};
  	 						} catch(\Exception $e){
+ 	 							Debugbar::addException($e);
 	 							throw new \Exception("No/Invalid key specified for system variable [".$key[0]."]");
  	 						}
 	 					}
 	 					else {
-	 						$value = $mailVariables[$var];
+	 						$value = $mailVariables[$key[0]][$key[1]];
 	 					}
  					}
 
+ 					// For Subject
+ 					try {
+						$input['subject'] = str_replace('##'.$variable.'##', $value, $input['subject']);
+					}
+					catch(\Exception $e){
+						Debugbar::addException($e);
+						throw new \Exception($variable.' is having wrong value');
+					}
+
+ 					// For Body
  					try {
 						$input['body'] = str_replace('##'.$variable.'##', $value, $input['body']);
 					}
 					catch(\Exception $e){
+						Debugbar::addException($e);
 						throw new \Exception($variable.' is having wrong value');
 					}
 				}
@@ -70,13 +93,15 @@ class EmailProvider extends Email implements EmailRepository {
 		}
 
 		// We got data, try to send email
-		$email = Mail::queue('emails.blank', $input, function($m) use($input, $template)
+		$email = Mail::queue('emails.blank', $input, function($m) use($input, $emailTemplate)
 		{
-			$m->from($input['from']['email'], $input['from']['name']);
+			if(isset($input['from']))
+				$m->from($input['from']['email'], $input['from']['name']);
+
 			$m->to($input['to']);
 
-			if($template != null){
-				$m->subject($template->subject);
+			if($emailTemplate != null){
+				$m->subject($emailTemplate->subject);
 			}
 			else {
 				$m->subject($input['subject']);
